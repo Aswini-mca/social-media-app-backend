@@ -37,4 +37,7 @@ async function updateNewPassword(resetToken, hashedPassword) {
     return await client.db("SMA").collection("users").updateOne({ _id: resetToken._id }, { $set: { password: hashedPassword, resetToken: null, resetTokenExpiresAt: null } })
 }
 
-export { getUserByName, genPassword, createUser, getUserByEmail, genToken, storeResetToken, getUserByResetToken, updateNewPassword }
+async function createNewPost(newpost) {
+    return await client.db("SMA").collection("post").insertOne({ newpost,likes:0})
+}
+export { getUserByName, genPassword, createUser, getUserByEmail, genToken, storeResetToken, getUserByResetToken, updateNewPassword,createNewPost }

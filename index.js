@@ -3,6 +3,7 @@ import { MongoClient } from "mongodb";
 import { usersRouter } from "./routes/users.js";
 import 'dotenv/config'
 import cors from "cors"
+import { postRouter } from "./routes/post.js";
 
 const app = express();
 const PORT = 9000;
@@ -29,5 +30,6 @@ app.get('/',(req,res)=>{
 })
 
 app.use('/users',usersRouter)
+app.use('/post',postRouter)
 
 app.listen(PORT,()=> console.log('The server started on the port',PORT))
