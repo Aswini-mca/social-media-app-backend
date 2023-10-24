@@ -5,17 +5,16 @@ const router = express.Router()
 //new post API
 router.post('/user/new-post', async (req, res) => {
     const { newpost } = req.body
-    const post = await newPost(req)
     try {
         //validate new post
         if (!newpost) {
             res.status(400).send({ error: "Post field is required" })
             return
         }
+        const post = await newPost(req)
         if (!post) {
             return res.status(400).send({ error: "Error occured while saving the post" })
         }
-
         res.status(201).json({ data: post, message: "Post saved successfully" })
     } catch (error) {
         return res.status(500).json({ message: 'Internal Server Error' });

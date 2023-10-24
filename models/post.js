@@ -4,7 +4,6 @@ import mongoose from "mongoose";
 const postSchema = new mongoose.Schema({
     newpost: {
         type: String,
-        required: true,
         trim: true
     },
     likecount: {
