@@ -1,7 +1,8 @@
 import express from "express";
 import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken"
-import { getUserByName, genPassword, createUser, genToken, getUserByResetToken, storeResetToken, updateNewPassword, getUserByEmail } from "../helpers.js";
+import jwt from "jsonwebtoken";
+import { User } from "../models/users.js";
+import { genPassword, getUserByName, getUserByEmail, genToken, storeResetToken, getUserByResetToken, updateNewPassword } from "../helpers.js";
 import nodemailer from "nodemailer";
 
 const router = express.Router()
@@ -9,10 +10,10 @@ const router = express.Router()
 //signup API
 router.post('/signup', async (req, res) => {
     const { username, firstname, lastname, email, password, gender, dob } = req.body;
-    const isUserExist = await getUserByName(username)
+    let user = await getUserByName(req)
 
     //validate username & required fields
-    if (isUserExist) {
+    if (user) {
         res.status(400).send({ error: "Username already exists" })
         return
     }
@@ -51,15 +52,23 @@ router.post('/signup', async (req, res) => {
         return
     }
     const hashedPassword = await genPassword(password)
-    const result = await createUser(username, firstname, lastname, email, hashedPassword, gender, dob)
+
+    user = new User({
+        username,
+        firstname,
+        lastname,
+        email,
+        password: hashedPassword,
+        gender,
+        dob
+    }).save();
     res.status(201).json({ message: "Successfully Created" })
 
 })
 
 //login API
 router.post('/login', async (req, res) => {
-    const { username, password } = req.body
-    const userFromDB = await getUserByName(username)
+    const userFromDB = await getUserByName(req)
 
     //validate username
     if (!userFromDB) {
@@ -67,7 +76,7 @@ router.post('/login', async (req, res) => {
         return
     }
     const storedDbPassword = userFromDB.password
-    const isPasswordMatch = await bcrypt.compare(password, storedDbPassword)
+    const isPasswordMatch = await bcrypt.compare(req.body.password, storedDbPassword)
 
     if (!isPasswordMatch) {
         res.status(400).send({ error: "Invalid Credentials" })
@@ -77,10 +86,10 @@ router.post('/login', async (req, res) => {
     res.status(201).json({ message: "Login successfully", token })
 })
 
-//forget password API
+// //forget password API
 router.post('/forget-password', async (req, res) => {
     const { email } = req.body
-    const userFromDB = await getUserByEmail(email)
+    let userFromDB = await getUserByEmail(req)
 
     //validate username
     if (!userFromDB) {
@@ -132,8 +141,8 @@ router.post('/reset-password/:token', async (req, res) => {
     const { newPassword, confirmPassword } = req.body
 
     try {
-        const resetToken = await getUserByResetToken(token)
-
+        let resetToken = await getUserByResetToken(token)
+    
         // Check if the reset token exists in the database
         if (!resetToken) {
             return res.status(404).json({ error: 'Invalid reset token' });
