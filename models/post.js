@@ -14,11 +14,6 @@ const postSchema = new mongoose.Schema({
         type: Number,
         default: 0
     },
-    comments: [{
-        type: ObjectId,
-        trim: true,
-        ref: "comment"
-    },],
     user: {
         type: ObjectId,
         ref: "user"
@@ -29,12 +24,19 @@ const postSchema = new mongoose.Schema({
 const Post = mongoose.model("post", postSchema);
 
 const commentSchema = new mongoose.Schema({
-    text: {
+    comment: {
         type: String
     },
-    author: {
+    username: {
+        type: String
+    },
+    userId: {
         type: ObjectId,
         ref: "user"
+    },
+    postId: {
+        type: ObjectId,
+        ref: "post"
     }
 })
 

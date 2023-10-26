@@ -1,7 +1,7 @@
 import bcrypt from "bcrypt"
 import randomstring from "randomstring"
 import { User } from "./models/users.js"
-import { Post } from "./models/post.js"
+import { Comment, Post } from "./models/post.js"
 
 async function genPassword(password) {
     const salt = await bcrypt.genSalt(15) // bcrypt.genSalt(no. of rounds)
@@ -46,6 +46,10 @@ async function getUserPost(req) {
     return await Post.find({ user: req.user._id }).populate("user", "username")
 }
 
+async function getPostById(req) {
+    return await Post.findById({ _id: req.params.id })
+}
+
 async function newPost(req) {
     return new Post({
         ...req.body,
@@ -64,4 +68,30 @@ async function updatePost(req) {
 async function deletePost(req) {
     return Post.findByIdAndDelete({ _id: req.params.id })
 }
-export { genPassword, getUserByName, getUserByEmail, genToken, storeResetToken, getUserByResetToken, updateNewPassword, getUserById, getAllPost, getUserPost, newPost, updatePost, deletePost }
+
+async function createComment(req) {
+    return new Comment({
+        ...req.body,
+        userId: req.user._id,
+        postId: req.params.id
+    }).save();
+}
+
+async function updateCommentCount(req) {
+    return Post.updateOne(
+        { _id: req.params.id },
+        { $inc: { commentCount: 1 } }
+    )
+}
+
+async function updateLike(req) {
+    return Post.updateOne(
+        { _id: req.params.id },
+        { $inc: { likecount: 1 } }
+    )
+}
+async function getComments(req) {
+    return await Comment.find({ postId: req.params.id })
+}
+
+export { genPassword, getUserByName, getUserByEmail, genToken, storeResetToken, getUserByResetToken, updateNewPassword, getUserById, getAllPost, getUserPost,getPostById, newPost, updatePost, deletePost, createComment, updateCommentCount, updateLike, getComments }
