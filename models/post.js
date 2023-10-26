@@ -14,6 +14,10 @@ const postSchema = new mongoose.Schema({
         type: Number,
         default: 0
     },
+    comments: [{
+        comment: String,
+        author: ObjectId
+    }],
     user: {
         type: ObjectId,
         ref: "user"
@@ -23,23 +27,4 @@ const postSchema = new mongoose.Schema({
 
 const Post = mongoose.model("post", postSchema);
 
-const commentSchema = new mongoose.Schema({
-    comment: {
-        type: String
-    },
-    username: {
-        type: String
-    },
-    userId: {
-        type: ObjectId,
-        ref: "user"
-    },
-    postId: {
-        type: ObjectId,
-        ref: "post"
-    }
-})
-
-const Comment = mongoose.model("comment", commentSchema)
-
-export { Post, Comment };
+export { Post };

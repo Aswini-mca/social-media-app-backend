@@ -29,6 +29,10 @@ router.post('/signup', async (req, res) => {
         res.status(400).send({ error: "Lastname field is required" })
         return
     }
+    if (!password) {
+        res.status(400).send({ error: "Password field is required" })
+        return
+    }
 
     //validate email pattern
     if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(email)) {
@@ -142,11 +146,22 @@ router.post('/reset-password/:token', async (req, res) => {
 
     try {
         let resetToken = await getUserByResetToken(token)
-    
+
         // Check if the reset token exists in the database
         if (!resetToken) {
             return res.status(404).json({ error: 'Invalid reset token' });
         }
+
+        //validate required fields
+        if (!newPassword) {
+            res.status(400).send({ error: "New Password field is required" })
+            return
+        }
+        if (!confirmPassword) {
+            res.status(400).send({ error: "Confirm Password is required " })
+            return
+        }
+
         const currentTime = Date.now();
         const resetTokenExpiration = resetToken.resetTokenExpiresAt.getTime();
 

@@ -1,7 +1,7 @@
 import bcrypt from "bcrypt"
 import randomstring from "randomstring"
 import { User } from "./models/users.js"
-import { Comment, Post } from "./models/post.js"
+import {  Post } from "./models/post.js"
 
 async function genPassword(password) {
     const salt = await bcrypt.genSalt(15) // bcrypt.genSalt(no. of rounds)
@@ -70,11 +70,12 @@ async function deletePost(req) {
 }
 
 async function createComment(req) {
-    return new Comment({
-        ...req.body,
-        userId: req.user._id,
-        postId: req.params.id
-    }).save();
+    // return new Comment({
+    //     ...req.body,
+    //     userId: req.user._id,
+    //     postId: req.params.id
+    // }).save();
+    return Post.updateOne({_id:req.params.id}, {$push:{comments:req.body,author:req.user._id}})
 }
 
 async function updateCommentCount(req) {
@@ -90,8 +91,19 @@ async function updateLike(req) {
         { $inc: { likecount: 1 } }
     )
 }
+
 async function getComments(req) {
-    return await Comment.find({ postId: req.params.id })
+    return await Post.find({ _id: req.params.id })
 }
 
-export { genPassword, getUserByName, getUserByEmail, genToken, storeResetToken, getUserByResetToken, updateNewPassword, getUserById, getAllPost, getUserPost,getPostById, newPost, updatePost, deletePost, createComment, updateCommentCount, updateLike, getComments }
+async function getTotalCounts() {
+    return Post.aggregate([{
+         $group:{
+            _id:'$_id',
+            totalLike:{$sum:'$likecount'},
+            totalComment:{$sum:'$commentCount'}
+         }
+    }])
+}
+
+export { genPassword, getUserByName, getUserByEmail, genToken, storeResetToken, getUserByResetToken, updateNewPassword, getUserById, getAllPost, getUserPost,getPostById, newPost, updatePost, deletePost, createComment, updateCommentCount, updateLike, getComments,getTotalCounts }

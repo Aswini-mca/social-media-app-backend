@@ -1,5 +1,5 @@
 import express from "express";
-import { createComment, deletePost, getAllPost, getComments, getPostById, getUserPost, newPost, updateCommentCount, updateLike, updatePost } from "../helpers.js";
+import { createComment, deletePost, getAllPost, getComments, getPostById, getTotalCounts, getUserPost, newPost, updateCommentCount, updateLike, updatePost } from "../helpers.js";
 const router = express.Router()
 
 //new post API
@@ -159,6 +159,21 @@ router.put('/user/like/:id', async (req, res) => {
 
     }
 
+})
+
+//to get total likeCount & commentCount of each post
+router.get('/totalLikes/totalComments', async (req, res) => {
+    try {
+        const total = await getTotalCounts()
+
+        if (!total) {
+            return res.status(404).send({ error: "Total counts are not avilable" })
+        }
+        res.status(200).json({ data: total})
+    } catch (error) {
+        return res.status(500).json({ message: 'Internal Server Error' });
+
+    }
 })
 
 export const postRouter = router
