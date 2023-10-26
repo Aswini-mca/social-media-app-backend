@@ -123,7 +123,7 @@ router.post('/forget-password', async (req, res) => {
         to: email,
         subject: "Password Reset Link",
         text: `random string is${resetToken}`,
-        html: `<h2>The link for reset your password will expire in 1 hour.<a href='http://localhost:3000/reset-password/${resetToken}'>http://localhost:3000/reset-password/${resetToken}</a></h2>`
+        html: `<h2>The link for reset your password will expire in 1 hour.<a href='https://steady-tulumba-e53b14.netlify.app/reset-password/${resetToken}'>https://steady-tulumba-e53b14.netlify.app/reset-password/${resetToken}</a></h2>`
     };
 
     transporter.sendMail(sendEmail, (err, info) => {
