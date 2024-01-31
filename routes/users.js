@@ -29,14 +29,14 @@ router.post('/signup', async (req, res) => {
         res.status(400).send({ error: "Lastname field is required" })
         return
     }
-    if (!password) {
-        res.status(400).send({ error: "Password field is required" })
-        return
-    }
 
     //validate email pattern
     if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(email)) {
         res.status(400).send({ error: "Email pattern does not match" })
+        return
+    }
+    if (!password) {
+        res.status(400).send({ error: "Password field is required" })
         return
     }
 
